@@ -1,0 +1,6 @@
+com\jts\inventory\dto\InventoryStatus.class
+com\jts\inventory\InventoryApplication.class
+com\jts\inventory\controller\InventoryController.class
+com\jts\inventory\dto\InventoryRequestDTO.class
+com\jts\inventory\dto\InventoryResponseDTO.class
+com\jts\inventory\service\InventoryService.class

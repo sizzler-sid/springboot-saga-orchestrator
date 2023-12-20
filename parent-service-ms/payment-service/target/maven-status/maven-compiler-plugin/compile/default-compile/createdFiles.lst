@@ -1,0 +1,6 @@
+com\jts\payment\dto\PaymentStatus.class
+com\jts\payment\PaymentApplication.class
+com\jts\payment\dto\PaymentResponseDTO.class
+com\jts\payment\dto\PaymentRequestDTO.class
+com\jts\payment\controller\PaymentControler.class
+com\jts\payment\service\PaymentService.class
