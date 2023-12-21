@@ -1,0 +1,92 @@
+---
+version: '3.8'
+services:
+  ## ZooKeeper Docker Compose Config
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.0.1
+    container_name: zookeeper
+    networks:  
+      - my-network
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      
+  ## Kafka Docker Compose Config
+  broker:
+    image: confluentinc/cp-kafka:7.0.1
+    container_name: broker
+    networks:  
+      - my-network
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      
+  ## Inventory Service
+  inventory-service-ms:
+    image: sidgarg/inventory-service-ms:latest
+    container_name: inventory-service-ms
+    networks:  
+      - my-network
+    ports:
+      - "8081:8081"
+    expose:
+      - "8081"
+    depends_on:
+      - broker
+      
+  ## Order Orchestrator Service
+  order-orchestrator-ms:
+    image: sidgarg/order-orchestrator-ms:latest
+    container_name: order-orchestrator-ms
+    networks:  
+      - my-network
+    ports:
+      - "8083:8083"
+    expose:
+      - "8083"
+    depends_on:
+      - broker
+      - inventory-service-ms
+      - payment-service-ms
+      
+  ## Order Service
+  order-service-ms:
+    image: sidgarg/order-service-ms:latest
+    container_name: order-service-ms
+    networks:  
+      - my-network
+    ports:
+      - "8080:8080"
+    expose:
+      - "8080"
+    depends_on:
+      - broker
+      - order-orchestrator-ms
+      
+  ## Payment Service
+  payment-service-ms:
+    image: sidgarg/payment-service-ms:latest
+    container_name: payment-service-ms
+    networks:  
+      - my-network
+    ports:
+      - "8082:8082"
+    expose:
+      - "8082"
+    depends_on:
+      - broker
+      
+networks:
+  my-network:
+    driver: bridge
